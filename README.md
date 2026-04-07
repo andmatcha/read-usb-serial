@@ -37,6 +37,29 @@ python3 read_usb_serial.py --port /dev/cu.usbmodem12301 --baudrate 115200
 python3 read_usb_serial.py --port /dev/cu.usbmodem12301 --baudrate 115200 --raw
 ```
 
+### Write serial data continuously
+
+```bash
+python3 write_usb_serial.py --port /dev/cu.usbmodem12301 --baudrate 115200 --message "ping" --append-newline --interval 1
+```
+
+`--count 10` のように指定すると回数を制限できます。省略時は `Ctrl+C` まで送り続けます。
+
+### Send uplink dummy Arm/Rover data
+
+```bash
+python3 send_uplink_dummy_data.py --list
+python3 send_uplink_dummy_data.py \
+  --arm-port /dev/cu.usbserial-ARM \
+  --rover-port /dev/cu.usbserial-ROVER
+python3 send_uplink_dummy_data.py \
+  --send-mode alternate \
+  --arm-port /dev/cu.usbserial-ARM \
+  --rover-port /dev/cu.usbserial-ROVER
+```
+
+`--arm-port` は `uplink` の `PacketAC_v6` に合う 39 バイトのバイナリフレームを送り、`--rover-port` は `0x120,1234\r\n` のような Rover 行データを送り続けます。片方だけ指定して単独送信もできます。既定の `--send-mode parallel` は Arm/Rover を並列送信し、`--send-mode alternate` を指定すると `Arm -> Rover -> Arm -> Rover` の順で交互に送ります。既定は `115200 8N1` で、周期は `--arm-interval` / `--rover-interval`、Rover の CAN ID は `--rover-can-ids 0x120 0x121 ...` で調整できます。
+
 ## Windows
 
 前提:
@@ -70,3 +93,21 @@ python read_usb_serial.py --port COM3 --baudrate 115200
 ```powershell
 python read_usb_serial.py --port COM3 --baudrate 115200 --raw
 ```
+
+### Write serial data continuously
+
+```powershell
+python write_usb_serial.py --port COM3 --baudrate 115200 --message "ping" --append-newline --interval 1
+```
+
+`--count 10` のように指定すると回数を制限できます。省略時は `Ctrl+C` まで送り続けます。
+
+### Send uplink dummy Arm/Rover data
+
+```powershell
+python send_uplink_dummy_data.py --list
+python send_uplink_dummy_data.py --arm-port COM3 --rover-port COM4
+python send_uplink_dummy_data.py --send-mode alternate --arm-port COM3 --rover-port COM4
+```
+
+`--arm-port` は `uplink` の `PacketAC_v6` に合う 39 バイトのバイナリフレームを送り、`--rover-port` は `0x120,1234\r\n` のような Rover 行データを送り続けます。片方だけ指定して単独送信もできます。既定の `--send-mode parallel` は Arm/Rover を並列送信し、`--send-mode alternate` を指定すると `Arm -> Rover -> Arm -> Rover` の順で交互に送ります。既定は `115200 8N1` で、周期は `--arm-interval` / `--rover-interval`、Rover の CAN ID は `--rover-can-ids 0x120 0x121 ...` で調整できます。
